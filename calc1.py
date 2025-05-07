@@ -71,7 +71,10 @@ class Interpreter(object):
             token = Token(PLUS, current_char)
             self.pos += 1
             return token
-
+        
+        if current_char == ' ':
+            self.pos += 1
+            return self.get_next_token()
         self.error()
 
     def eat(self, token_type):
@@ -90,16 +93,33 @@ class Interpreter(object):
         self.current_token = self.get_next_token()
 
         # we expect the current token to be a single-digit integer
-        left = self.current_token
-        self.eat(INTEGER)
+        left = 0
+        while True:
+            c = self.current_token.value
+            try:
+                self.eat(INTEGER)
+            except:
+                break
+            left = left*10 + (c)
+            
+
+        #left = self.current_token
+       # self.eat(INTEGER)
 
         # we expect the current token to be a '+' token
         op = self.current_token
         self.eat(PLUS)
 
         # we expect the current token to be a single-digit integer
-        right = self.current_token
-        self.eat(INTEGER)
+        right = 0
+        while True:#
+            c = self.current_token.value
+            try:
+                self.eat(INTEGER)
+            except:
+                break
+            right = right*10 + (c)
+            
         # after the above call the self.current_token is set to
         # EOF token
 
@@ -107,7 +127,7 @@ class Interpreter(object):
         # has been successfully found and the method can just
         # return the result of adding two integers, thus
         # effectively interpreting client input
-        result = left.value + right.value
+        result = left + right
         return result
 
 
