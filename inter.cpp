@@ -136,3 +136,5 @@ int main(void){
         
         
 }
+
+//TODO - handle inputs with more than one operator 
