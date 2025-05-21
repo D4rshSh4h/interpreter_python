@@ -7,6 +7,7 @@
 enum class Type{
     NUMBER,
     PLUS,
+    MINUS,
     ERROR,
     END
 };
@@ -65,13 +66,21 @@ class Interpreter{
         std::string number;
         
         char c = text.at(pos);
-        while(c >= 48 && c <= 57 && pos < text.size()){
-            c = text.at(pos);
+        while(c >= 48 && c <= 57){
+            
             number += c;
             ++pos;
+            if (pos < text.size()){
+                c = text.at(pos);
+            }
+            else{
+                 break;
+            }
+            
            
         }
         return number;
+       
     }
     
     Token get_next_token(){
@@ -91,6 +100,11 @@ class Interpreter{
             std::string s(1, c_p);  
             return Token(Type::PLUS,s);
         }
+        if (c_p == '-'){
+            pos += 1;
+            std::string s(1, c_p);  
+            return Token(Type::MINUS,s);
+        }
         return Token(Type::ERROR, "");
     }
 
@@ -103,19 +117,29 @@ class Interpreter{
         }
     }
 
+    int term(){
+        Token token = current_token;
+        check(Type::NUMBER);
+        return std::stoi(token.get_value());
+    }
+
     long int expr(){
         current_token = get_next_token();
-        std::string left = current_token.get_value();
-        check(Type::NUMBER);
-
-        Token op = current_token;
-        check(Type::PLUS);
-
-        std::string right = current_token.get_value();
-        check(Type::NUMBER);
-
-        return std::stoi(left) + std::stoi(right);
-
+        int result = term();
+        //Type type = current_token.get_type();
+        while(current_token.get_type() == Type::PLUS || current_token.get_type() == Type::MINUS){
+            Token t = current_token;
+            if(t.get_type() == Type::MINUS){
+                check(Type::MINUS);
+                result = result - term();
+            }
+            else if(t.get_type() == Type::PLUS){
+                check(Type::PLUS);
+                result += term();
+            }
+            
+        }
+        return result;
     }
 };
 
